@@ -1,0 +1,41 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat - Skill Exchange Platform</title>
+    <style>
+        #chatBox { width: 50%; height: 300px; border: 1px solid #ccc; overflow-y: scroll; margin: 20px auto; padding: 10px; }
+        #messageInput { width: 45%; }
+    </style>
+</head>
+<body>
+    <h2>Real-Time Chat</h2>
+    <div id="chatBox"></div>
+    <input type="text" id="messageInput" placeholder="Type your message...">
+    <button onclick="sendMessage()">Send</button>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        // Display incoming messages in the chat box
+        socket.on('message', (data) => {
+            const chatBox = document.getElementById('chatBox');
+            const messageElement = document.createElement('div');
+            messageElement.innerHTML = `<strong>${data.username}:</strong> ${data.message} <small>(${new Date(data.timestamp).toLocaleTimeString()})</small>`;
+            chatBox.appendChild(messageElement);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+
+        // Send a message to the server
+        function sendMessage() {
+            const message = document.getElementById('messageInput').value;
+            socket.emit('sendMessage', { message, timestamp: Date.now() });
+            document.getElementById('messageInput').value = '';
+        }
+    </script>
+</body>
+</html>
